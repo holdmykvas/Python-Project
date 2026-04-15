@@ -27,3 +27,19 @@ class Expense:
 
 class ValidationError(Exception):
     pass
+
+class BudgetManager:
+    def __init__(self,filename = "data.json"):
+        self.expenses = []
+        self.filename = filename
+        pass
+
+    def add_expense(self,expense_obj):
+        self.expenses.append(expense_obj)
+        pass
+
+    def save_data(self):
+        self.filename = "data.json"
+        with open(self.filename,"w") as f:
+            list_of_dict = [{"amount": e.amount,"date": e.date} for e in self.expenses]
+        json.dump(list_of_dict,f,indent=4)
