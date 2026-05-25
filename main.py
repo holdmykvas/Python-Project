@@ -1,5 +1,12 @@
 from tracker import Expense, ValidationError, BudgetManager
 
+#BUGS:
+# doesn't see data.json to load from
+
+#ideas:
+#add expense
+#
+
 
 def main():
     manager = BudgetManager()
@@ -11,7 +18,9 @@ def main():
         print("2. View All Expenses")
         print("3. Sort By Date")
         print("4. Filter by Category")
-        print("5. Exit")
+        print("5. View Unique Categories")
+        print("6. Run Analytics & Forecast")
+        print("7. Exit")
 
         choice = input("Select an option: ").strip()
 
@@ -21,19 +30,19 @@ def main():
             if not Expense.is_valid_amount(amount):
                 raise ValidationError("Error: Amount is invalid! | Try format : 10.50 or 10")
                 continue
-            print("Amount accepted!")
+            print("--Amount accepted!")
 
             category = input("Enter the category: ").strip()
-            print("Category accepted!")
+            print("--Category accepted!")
 
             date = input("Enter the date: ").strip()
             if not Expense.is_valid_date(date):
                 raise ValidationError("Error: Date is invalid! | Try format : YYYY-MM-DD")
-            print("Date accepted!")
+            print("--Date accepted!")
 
             expense = Expense(amount, category, date)
             manager.add_expense(expense)
-            print("Expense added!")
+            print("--Expense added!")
 
         elif choice == "2":
             if not manager.expenses:
@@ -58,6 +67,14 @@ def main():
                 for exp in results:
                     print(exp)
         elif choice == "5":
+            if not manager.expenses:
+                print("No expenses recorded yet.")
+            else:
+                unique_categories = {exp.category for exp in manager.expenses}
+                print("Categories used:", ", ".join(unique_categories))
+        elif choice == "6":
+            print(manager.generate_spending_report())
+        elif choice == "7":
             manager.save_data()
             print("Data saved to JSON. Exiting...")
             break
