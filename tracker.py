@@ -1,8 +1,15 @@
+import json
 import re
 
+def log_action(action_name):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            print(f"[LOG] Executing: {action_name}")
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
 
 class Expense:
-
     def __init__(self,amount,category,date):
         self.amount = amount
         self.category = category
@@ -34,12 +41,16 @@ class BudgetManager:
         self.filename = filename
         pass
 
+    @log_action("Adding new expense")
     def add_expense(self,expense_obj):
         self.expenses.append(expense_obj)
-        pass
 
     def save_data(self):
-        self.filename = "data.json"
         with open(self.filename,"w") as f:
-            list_of_dict = [{"amount": e.amount,"date": e.date} for e in self.expenses]
-        json.dump(list_of_dict,f,indent=4)
+            list_of_dict = [{"amount": e.amount, "category": e.category ,"date": e.date} for e in self.expenses]
+            json.dump(list_of_dict,f,indent=4)
+
+    def generate_expense_category(self,category):
+        for exp in self.expenses:
+            if exp.category.lower() == category.lower():
+                yield exp
