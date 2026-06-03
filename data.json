@@ -1,0 +1,27 @@
+[
+    {
+        "amount": "15.00",
+        "category": "Groceries",
+        "date": "2026-05-03"
+    },
+    {
+        "amount": "180",
+        "category": "Groceries",
+        "date": "2026-05-05"
+    },
+    {
+        "amount": "200",
+        "category": "Tech",
+        "date": "2026-05-15"
+    },
+    {
+        "amount": "50",
+        "category": "Clothes",
+        "date": "2026-05-13"
+    },
+    {
+        "amount": "123",
+        "category": "Other",
+        "date": "2026-05-20"
+    }
+]

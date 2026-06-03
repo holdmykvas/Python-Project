@@ -2,8 +2,7 @@ import os
 
 from tracker import Expense, ValidationError, BudgetManager
 
-
-
+#implement entering category as today
 
 def handle_add_expense(manager):
     try:
@@ -28,9 +27,46 @@ def handle_add_expense(manager):
 def handle_view_expenses(manager):
     if not manager.expenses:
         print("No expenses added yet!")
+        return
     else:
-        for exp in manager.expenses:
+        print("\nHow would you like to view your expenses?")
+        print("1. Default (Order Added)")
+        print("2. Sorted by Date")
+        print("3. Sorted by Amount (Highest to Lowest)")
+
+        view_choice = input("Select a sort option: ").strip()
+
+        if view_choice == "1":
+            expenses = manager.expenses
+        elif view_choice == "2":
+            expenses = sorted(manager.expenses, key=lambda e: e.date)
+        elif view_choice == "3":
+            expenses = sorted(manager.expenses, key=lambda e: float(e.amount), reverse=True)
+        else:
+            print("Invalid input!")
+            expenses = manager.expenses
+
+        print("\nExpenses List:")
+        for expense in expenses:
+            print(expense)
+
+def handle_filter_expenses(manager):
+    handle_unique_category(manager)
+    cat_search = input("Enter category to search: ").strip()
+    results = list(manager.generate_expense_category(cat_search))
+    if not results:
+        print("No expenses found for that category.")
+    else:
+        for exp in results:
             print(exp)
+
+def handle_unique_category(manager):
+    if not manager.expenses:
+        print("No expenses recorded yet.")
+    else:
+        unique_categories = {exp.category for exp in manager.expenses}
+        print("Categories used: \n*", "\n* ".join(unique_categories))
+
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -42,11 +78,10 @@ def main():
         print("\nMenu Options:")
         print("1. Add Expense")
         print("2. View All Expenses")
-        print("3. Sort By Date")
-        print("4. Filter by Category")
-        print("5. View Unique Categories")
-        print("6. Run Analytics & Forecast")
-        print("7. Exit \n")
+        print("3. Filter by Category")
+        print("4. View Unique Categories")
+        print("5. Run Analytics & Forecast")
+        print("6. Exit \n")
 
         choice = input("Select an option: ").strip()
 
@@ -58,33 +93,15 @@ def main():
             handle_view_expenses(manager)
 
         elif choice == "3":
-            if not manager.expenses:
-                print("No expenses recorded yet.")
-            else:
-                sorted_expenses = sorted(manager.expenses, key=lambda e: e.date)
-                for exp in sorted_expenses:
-                    print(exp)
+            handle_filter_expenses(manager)
 
         elif choice == "4":
-            cat_search = input("Enter category to search: ").strip()
-            results = list(manager.generate_expense_category(cat_search))
-            if not results:
-                print("No expenses found for that category.")
-            else:
-                for exp in results:
-                    print(exp)
+            handle_unique_category(manager)
 
         elif choice == "5":
-            if not manager.expenses:
-                print("No expenses recorded yet.")
-            else:
-                unique_categories = {exp.category for exp in manager.expenses}
-                print("Categories used:", ", ".join(unique_categories))
-
-        elif choice == "6":
             print(manager.generate_spending_report())
 
-        elif choice == "7":
+        elif choice == "6":
             manager.save_data()
             print("Data saved to JSON. Exiting...")
             break
@@ -93,7 +110,7 @@ def main():
             print("Invalid input! | Try again.")
 
         if choice != "7":
-            input("Press Enter to return to the main menu.")
+            input("\nPress Enter to return to the main menu.")
         clear_screen()
 
 if __name__ == "__main__":
