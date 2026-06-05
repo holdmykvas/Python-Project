@@ -10,6 +10,15 @@ def log_action(action_name):
         return wrapper
     return decorator
 
+
+class Colors:
+    GREEN = '\033[92m'
+    RED = '\033[91m'
+    CYAN = '\033[96m'
+    YELLOW = '\033[93m'
+    RESET = '\033[0m'
+    BOLD = '\033[1m'
+
 class Expense:
     def __init__(self,amount,category,date):
         self.amount = amount
@@ -36,13 +45,14 @@ class Expense:
 class ValidationError(Exception):
     pass
 
+
 class BudgetManager:
     def __init__(self,filename = "data.json"):
         self.expenses = []
         self.filename = filename
         self.load_data()
 
-    @log_action("Adding new expense")
+    @log_action(f"{Colors.GREEN}Adding new expense{Colors.RESET}")
     def add_expense(self,expense_obj):
         self.expenses.append(expense_obj)
 
@@ -53,11 +63,11 @@ class BudgetManager:
                 for item in data:
                     loaded_expense = Expense(item["amount"], item["category"], item["date"])
                     self.expenses.append(loaded_expense)
-            print(f"[LOG] Successfully loaded {len(self.expenses)} expenses from {self.filename}")
+            print(f"{Colors.GREEN}[LOG] Successfully loaded {len(self.expenses)} expenses from {self.filename}{Colors.RESET}")
         except FileNotFoundError:
-            print("[LOG] No existing data file found. Starting fresh.")
+            print(f"{Colors.RED}[LOG] No existing data file found. Starting fresh.{Colors.RESET}")
         except json.JSONDecodeError:
-            print("[LOG] Error reading the data file. Starting fresh.")
+            print(f"{Colors.RED}[LOG] Error reading the data file. Starting fresh.{Colors.RESET}")
 
 
     def save_data(self):
@@ -72,7 +82,7 @@ class BudgetManager:
 
     def generate_spending_report(self):
         if not self.expenses:
-            return "Not enough data to generate a report!"
+            return f"{Colors.RED}Not enough data to generate a report!{Colors.RESET}"
 
         categories = {exp.category for exp in self.expenses}
 
@@ -89,8 +99,8 @@ class BudgetManager:
         days_diff = (max(dates) - min(dates)).days + 1
         daily_average = total_spent / days_diff
         forecast_30_days = daily_average * 30
-
-        report = f"\n=== SPENDING & ANALYTICS REPORT ===\n"
+#TODO SORTING OF BREAKDOWN
+        report = f"\n{Colors.CYAN}=== SPENDING & ANALYTICS REPORT ==={Colors.RESET}\n"
         report += f"Total Expenses Logged: {len(self.expenses)}\n"
         report += f"Total Amount Spent: {total_spent:.2f}\n"
         report += f"Most Expensive Category: '{most_expensive_cat}' ({category_totals[most_expensive_cat]:.2f})\n"
@@ -100,7 +110,7 @@ class BudgetManager:
             percentage = (total / total_spent) * 100
             report += f"  - {cat}: {total:.2f} ({percentage:.1f}%)\n"
         report += "-----------------------------------\n"
-        report += f"Daily Average Spend: {daily_average:.2f}\n"
-        report += f"Projected 30-Day Spend: {forecast_30_days:.2f}\n"
+        report += f"{Colors.BOLD}Daily Average Spend:{Colors.RESET} {daily_average:.2f}\n"
+        report += f"{Colors.BOLD}Projected 30-Day Spend:{Colors.RESET}  {forecast_30_days:.2f} \n"
         report += "==================================="
         return report
